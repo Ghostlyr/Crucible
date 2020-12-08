@@ -1881,49 +1881,60 @@
  
          if ("MC|BEdit".equals(p_147349_1_.func_149559_c()))
          {
-@@ -1075,34 +2437,52 @@
+@@ -1075,34 +2437,54 @@
  
              try
              {
 -                itemstack = packetbuffer.readItemStackFromBuffer();
 +                push = packetbuffer.readItemStackFromBuffer();
  
--                if (itemstack == null)
+-                if (itemstack != null)
 +                if (push == null)
                  {
-                     return;
-                 }
+-                    if (!ItemWritableBook.func_150930_a(itemstack.getTagCompound()))
+-                    {
+-                        throw new IOException("Invalid book tag!");
+-                    }
++                    return;
++                }
  
--                if (!ItemWritableBook.func_150930_a(itemstack.getTagCompound()))
+-                    itemstack1 = this.playerEntity.inventory.getCurrentItem();
 +                if (!ItemWritableBook.func_150930_a(push.getTagCompound()))
-                 {
-                     throw new IOException("Invalid book tag!");
-                 }
++                {
++                    throw new IOException("Invalid book tag!");
++                }
  
--                itemstack1 = this.playerEntity.inventory.getCurrentItem();
+-                    if (itemstack1 == null)
+-                    {
+-                        return;
+-                    }
 +                stack = this.playerEntity.inventory.getCurrentItem();
  
--                if (itemstack1 != null)
-+                if (stack != null)
-                 {
 -                    if (itemstack.getItem() == Items.writable_book && itemstack.getItem() == itemstack1.getItem())
-+                    if (push.getItem() == Items.writable_book && push.getItem() == stack.getItem())
-                     {
+-                    {
 -                        itemstack1.setTagInfo("pages", itemstack.getTagCompound().getTagList("pages", 8));
-+                        //nouveau = stack.copy();
-+                        //ItemWritableBook.shadowUpdate(nouveau, push, false);
-+                        //CraftEventFactory.handleEditBookEvent(playerEntity, nouveau); // CraftBukkit
-+                        //this.playerEntity.inventory.setInventorySlotContents(this.playerEntity.inventory.currentItem, nouveau);
-+                        ItemWritableBook.shadowUpdate(stack, push, false);
-+                        CraftEventFactory.handleEditBookEvent(playerEntity, stack); // CraftBukkit
-                     }
-+                    else
-+                    {
-+                        throw new RuntimeException("Bogey book-user! Stop using AllUWant");
-+                    }
- 
+-                    }
+-
++                if (stack != null)
++                {
                      return;
                  }
++
++                if (push.getItem() == Items.writable_book && push.getItem() == stack.getItem())
++                {
++                    //nouveau = stack.copy();
++                    //ItemWritableBook.shadowUpdate(nouveau, push, false);
++                    //CraftEventFactory.handleEditBookEvent(playerEntity, nouveau); // CraftBukkit
++                    //this.playerEntity.inventory.setInventorySlotContents(this.playerEntity.inventory.currentItem, nouveau);
++                    ItemWritableBook.shadowUpdate(stack, push, false);
++                    CraftEventFactory.handleEditBookEvent(playerEntity, stack); // CraftBukkit
++                }
++                else
++                {
++                    throw new RuntimeException("Bogey book-user! Stop using AllUWant");
++                }
++
++                return;
              }
 -            catch (Exception exception4)
 +            // CraftBukkit start
@@ -1944,48 +1955,53 @@
              }
              finally
              {
-@@ -1117,37 +2497,48 @@
+@@ -1117,37 +2499,50 @@
  
              try
              {
 -                itemstack = packetbuffer.readItemStackFromBuffer();
 +                push = packetbuffer.readItemStackFromBuffer();
  
--                if (itemstack != null)
+-                if (itemstack == null)
 +                if (push != null)
                  {
--                    if (!ItemEditableBook.validBookTagContents(itemstack.getTagCompound()))
-+                    if (!ItemEditableBook.validBookTagContents(push.getTagCompound()))
-                     {
-                         throw new IOException("Invalid book tag!");
-                     }
+                     return;
+                 }
  
--                    itemstack1 = this.playerEntity.inventory.getCurrentItem();
-+                    stack = this.playerEntity.inventory.getCurrentItem();
+-                if (!ItemEditableBook.validBookTagContents(itemstack.getTagCompound()))
++                if (!ItemEditableBook.validBookTagContents(push.getTagCompound()))
+                 {
+                     throw new IOException("Invalid book tag!");
+                 }
  
--                    if (itemstack1 == null)
-+                    if (stack == null)
-                     {
-                         return;
-                     }
+-                itemstack1 = this.playerEntity.inventory.getCurrentItem();
++                stack = this.playerEntity.inventory.getCurrentItem();
  
+-                if (itemstack1 != null)
++                if (stack == null)
+                 {
 -                    if (itemstack.getItem() == Items.written_book && itemstack1.getItem() == Items.writable_book)
-+                    if (push.getItem() == Items.written_book && stack.getItem() == Items.writable_book)
-                     {
+-                    {
 -                        itemstack1.setTagInfo("author", new NBTTagString(this.playerEntity.getCommandSenderName()));
 -                        itemstack1.setTagInfo("title", new NBTTagString(itemstack.getTagCompound().getString("title")));
 -                        itemstack1.setTagInfo("pages", itemstack.getTagCompound().getTagList("pages", 8));
 -                        itemstack1.func_150996_a(Items.written_book);
-+                        nouveau = stack.copy();
-+                        nouveau.func_150996_a(Items.written_book);
-+                        nouveau.setTagInfo("author", new NBTTagString(this.playerEntity.getCommandSenderName()));
-+                        ItemWritableBook.shadowUpdate(nouveau, push, true);
-+                        this.playerEntity.inventory.setInventorySlotContents(this.playerEntity.inventory.currentItem, nouveau);
-+                        CraftEventFactory.handleEditBookEvent(playerEntity,nouveau);
-                     }
- 
+-                    }
+-
                      return;
                  }
++
++                if (push.getItem() == Items.written_book && stack.getItem() == Items.writable_book)
++                {
++                    nouveau = stack.copy();
++                    nouveau.func_150996_a(Items.written_book);
++                    nouveau.setTagInfo("author", new NBTTagString(this.playerEntity.getCommandSenderName()));
++                    ItemWritableBook.shadowUpdate(nouveau, push, true);
++                    this.playerEntity.inventory.setInventorySlotContents(this.playerEntity.inventory.currentItem, nouveau);
++                    CraftEventFactory.handleEditBookEvent(playerEntity,nouveau);
++                }
++
++                return;
              }
 -            catch (Exception exception3)
 +            // CraftBukkit start
@@ -2006,7 +2022,7 @@
              }
              finally
              {
-@@ -1174,9 +2565,12 @@
+@@ -1174,9 +2569,12 @@
                          ((ContainerMerchant)container).setCurrentRecipeIndex(i);
                      }
                  }
@@ -2020,7 +2036,7 @@
                  }
              }
              else if ("MC|AdvCdm".equals(p_147349_1_.func_149559_c()))
-@@ -1222,9 +2616,12 @@
+@@ -1222,9 +2620,12 @@
                              this.playerEntity.addChatMessage(new ChatComponentTranslation("advMode.setCommand.success", new Object[] {s1}));
                          }
                      }
@@ -2035,7 +2051,7 @@
                      }
                      finally
                      {
-@@ -1257,9 +2654,12 @@
+@@ -1257,9 +2658,12 @@
                              tileentitybeacon.markDirty();
                          }
                      }
@@ -2050,7 +2066,7 @@
                      }
                  }
              }
-@@ -1281,6 +2681,13 @@
+@@ -1281,6 +2685,13 @@
                      containerrepair.updateItemName("");
                  }
              }
@@ -2064,7 +2080,7 @@
          }
      }
  
-@@ -1292,6 +2699,21 @@
+@@ -1292,6 +2703,21 @@
          }
      }
  
