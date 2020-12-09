@@ -1915,7 +1915,7 @@
 -                        itemstack1.setTagInfo("pages", itemstack.getTagCompound().getTagList("pages", 8));
 -                    }
 -
-+                if (stack != null)
++                if (stack == null)
 +                {
                      return;
                  }
@@ -1963,7 +1963,7 @@
 +                push = packetbuffer.readItemStackFromBuffer();
  
 -                if (itemstack == null)
-+                if (push != null)
++                if (push == null)
                  {
                      return;
                  }
